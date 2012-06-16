@@ -1,0 +1,11 @@
+Installation Instructions
+*************************
+
+Run the following commands to build libowl.so and install it
+in your library directory:
+cmake .
+make
+make install
+
+To configure variables used by cmake, such as your lib directory,
+run `cmake --help` to find the appropriate command line parameters.
