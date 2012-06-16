@@ -10,3 +10,7 @@
 *.lai
 *.la
 *.a
+
+#vim Swap files
+*.swp
+
