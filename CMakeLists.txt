@@ -4,6 +4,7 @@ project (LibOwlC++)
 # The version number.
 set (LibOwl_VERSION_MAJOR 1)
 set (LibOwl_VERSION_MINOR 0)
+set (LibOwl_VERSION_REVISION 0)
 
 set(CMAKE_CXX_FLAGS "-O2 -std=c++0x -Wall -Wextra -Wno-sign-compare")
 
