@@ -116,11 +116,11 @@ void ClientSocket::send(const std::vector<unsigned char>& buff) {
   uint64_t written = 0;
   std::string arr(buff.begin(), buff.end());
   while (written < arr.length()) {
-    //Wait for the socket to become ready (we will block on sends for 0.1 seconds)
+    //Wait for the socket to become ready (we will block on sends for 1 second)
     pollfd fds;
     fds.fd = sock_fd;
     fds.events = POLLOUT;
-    poll(&fds, 1, 100);
+    poll(&fds, 1, 1000);
     if ( (fds.revents & POLLOUT) != POLLOUT) {
       throw std::runtime_error("Error sending data over socket: Resource temporarily unavailable");
     }
@@ -155,8 +155,10 @@ ClientSocket::~ClientSocket() {
     shutdown(sock_fd, SHUT_RDWR);
     //Block until read returns 0 or the socket locks up
     char buff[100];
+    //TODO FIXME Not actually blocking here
     while (0 != read(sock_fd, buff, sizeof(buff)) and
            EWOULDBLOCK != errno);
+    //TODO FIXME Should check error codes here
     close(sock_fd);
     sock_fd = -1;
   }
@@ -223,6 +225,9 @@ ServerSocket::ServerSocket(int domain, int type, int sock_flags, uint32_t port) 
 
         //Make the socket
         sock_fd = socket(addr->ai_family, addr->ai_socktype | sock_flags, addr->ai_protocol);
+        //Increase the socket send buffer size
+        int sock_buf_size = 128000;
+        setsockopt(sock_fd, SOL_SOCKET, SO_SNDBUF, (const void*)&sock_buf_size, sizeof(sock_buf_size));
         //Make the socket ignore address in use errors.
         //int opt = 1;
         //setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, (const void*)&opt, sizeof(opt));
