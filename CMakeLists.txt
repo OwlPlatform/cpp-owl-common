@@ -15,7 +15,26 @@ include_directories ("${LibOwlC++_SOURCE_DIR}/include")
 add_subdirectory (src)
 add_subdirectory (include)
 
-## the following are directories where stuff will be installed to
+# Set different flags based upon OS versions
+#if(LINUX AND EXISTS "/etc/redhat-release")
+  #set(REDHAT TRUE)
+#endif()
+
+#if(LINUX AND EXISTS "/etc/slackware-version")
+  #set(SLACKWARE TRUE)
+#endif()
+
+#Set the correct library directory suffix
+if(NOT DEFINED LIB_SUFFIX)
+  get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
+  if (${LIB64} STREQUAL "TRUE")
+    set(LIBSUFFIX 64)
+  else()
+    set(LIBSUFFIX "")
+  endif()
+  set(LIB_SUFFIX ${LIBSUFFIX} CACHE STRING "lib directory suffix")
+endif()
+
 SET(PKGCONFIG_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig/" CACHE STRING "Base directory for pkgconfig files")
 SET(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include/owl/" CACHE PATH "The subdirectory to the header prefix")
 

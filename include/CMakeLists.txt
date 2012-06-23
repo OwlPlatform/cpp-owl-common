@@ -5,6 +5,7 @@ SET(IncludeFiles
   sensor_aggregator_protocol.hpp
   simple_sockets.hpp
   world_model_protocol.hpp
+  message_receiver.hpp
 )
 
 #Need to install all of the include files
