@@ -512,7 +512,7 @@ Buffer solver::makeTypeAnnounceMsg(const vector<solver::AliasType>& type_alias, 
   for (auto alias = type_alias.begin(); alias != type_alias.end(); ++alias) {
     total_length += pushBackVal(alias->alias, buff);
     total_length += pushBackSizedUTF16(buff, alias->type);
-    total_length += pushBackVal((uint8_t)(alias->transient ? 1 : 0), buff);
+    total_length += pushBackVal((uint8_t)(alias->on_demand ? 1 : 0), buff);
   }
 
   total_length += pushBackUTF16(buff, origin);
@@ -537,8 +537,8 @@ pair<std::vector<solver::AliasType>, u16string> solver::decodeTypeAnnounceMsg(Bu
     for (size_t i = 0; i < total_aliases; ++i) {
       uint32_t alias = reader.readPrimitive<uint32_t>();
       u16string type = reader.readSizedUTF16();
-      uint8_t transient = reader.readPrimitive<uint8_t>();
-      aliases.push_back(AliasType{alias, type, transient != 0});
+      uint8_t on_demand = reader.readPrimitive<uint8_t>();
+      aliases.push_back(AliasType{alias, type, on_demand != 0});
     }
   }
   u16string origin = reader.readUTF16((buff.size() - reader.cur_index)/2);
@@ -609,7 +609,7 @@ std::vector<std::tuple<uint32_t, std::vector<std::u16string>>> solver::decodeSta
 
 Buffer solver::makeStopOnDemand(const std::vector<std::tuple<uint32_t, std::vector<std::u16string>>>& aliases) {
   Buffer buff = makeStartOnDemand(aliases);
-  buff[4] = (uint8_t)MessageID::stop_transient;
+  buff[4] = (uint8_t)MessageID::stop_on_demand;
   return buff;
 }
 
@@ -619,7 +619,7 @@ std::vector<std::tuple<uint32_t, std::vector<std::u16string>>> solver::decodeSto
   uint32_t total_length = reader.readPrimitive<uint32_t>();
   MessageID msg_type = reader.readPrimitive<MessageID>();
   if ( buff.size() == (total_length + 4) and
-       msg_type == MessageID::stop_transient) {
+       msg_type == MessageID::stop_on_demand) {
 
     buff[4] = (uint8_t)MessageID::start_on_demand;
     return decodeStartOnDemand(buff);

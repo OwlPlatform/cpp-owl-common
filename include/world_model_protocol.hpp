@@ -237,7 +237,7 @@ namespace world_model {
     enum class MessageID : uint8_t {keep_alive       = 0,
                                     type_announce    = 1,
                                     start_on_demand  = 2,
-                                    stop_transient   = 3,
+                                    stop_on_demand   = 3,
                                     solver_data      = 4,
                                     create_uri       = 5,
                                     expire_uri       = 6,
@@ -259,8 +259,8 @@ namespace world_model {
 
     /**
      * The AliasType of the solver->world model protocol is different than
-     * in the client->world model because it keeps track of transient information.
-     * A transient type is not stored in the world model and data is only sent
+     * in the client->world model because it keeps track of on_demand information.
+     * A on_demand type is not stored in the world model and data is only sent
      * from the solver to the world model if that data type was requested
      * by a client.
      */
@@ -268,7 +268,7 @@ namespace world_model {
       //The alias used to refer to this type.
       uint32_t alias;
       std::u16string type;
-      bool transient;
+      bool on_demand;
     };
 
     /**
