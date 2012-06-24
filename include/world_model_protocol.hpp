@@ -236,7 +236,7 @@ namespace world_model {
   namespace solver {
     enum class MessageID : uint8_t {keep_alive       = 0,
                                     type_announce    = 1,
-                                    start_transient  = 2,
+                                    start_on_demand  = 2,
                                     stop_transient   = 3,
                                     solver_data      = 4,
                                     create_uri       = 5,

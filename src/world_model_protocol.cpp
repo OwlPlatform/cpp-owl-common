@@ -559,7 +559,7 @@ Buffer solver::makeStartTransient(const std::vector<std::tuple<uint32_t, std::ve
   //Push back space in the buffer for the total length.
   pushBackVal(total_length, buff);
   //Push back the message type.
-  total_length += pushBackVal(MessageID::start_transient, buff);
+  total_length += pushBackVal(MessageID::start_on_demand, buff);
 
   //Push back the total number of aliases
   total_length += pushBackVal<uint32_t>(aliases.size(), buff);
@@ -586,7 +586,7 @@ std::vector<std::tuple<uint32_t, std::vector<std::u16string>>> solver::decodeSta
 
   //Check to make sure this is a valid message.
   if ( buff.size() == (total_length + 4) and
-       msg_type == MessageID::start_transient) {
+       msg_type == MessageID::start_on_demand) {
 
     uint32_t total_aliases = reader.readPrimitive<uint32_t>();
     for (uint32_t alias = 0; alias < total_aliases; ++alias) {
@@ -621,7 +621,7 @@ std::vector<std::tuple<uint32_t, std::vector<std::u16string>>> solver::decodeSto
   if ( buff.size() == (total_length + 4) and
        msg_type == MessageID::stop_transient) {
 
-    buff[4] = (uint8_t)MessageID::start_transient;
+    buff[4] = (uint8_t)MessageID::start_on_demand;
     return decodeStartTransient(buff);
   }
   //Otherwise return an empty vector
