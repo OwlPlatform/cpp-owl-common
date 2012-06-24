@@ -292,11 +292,11 @@ namespace world_model {
     Buffer makeTypeAnnounceMsg(const std::vector<AliasType>& type_alias, const std::u16string& origin);
     std::pair<std::vector<AliasType>, std::u16string> decodeTypeAnnounceMsg(Buffer& buff);
 
-    Buffer makeStartTransient(const std::vector<std::tuple<uint32_t, std::vector<std::u16string>>>& aliases);
-    std::vector<std::tuple<uint32_t, std::vector<std::u16string>>> decodeStartTransient(Buffer& buff);
+    Buffer makeStartOnDemand(const std::vector<std::tuple<uint32_t, std::vector<std::u16string>>>& aliases);
+    std::vector<std::tuple<uint32_t, std::vector<std::u16string>>> decodeStartOnDemand(Buffer& buff);
 
-    Buffer makeStopTransient(const std::vector<std::tuple<uint32_t, std::vector<std::u16string>>>& aliases);
-    std::vector<std::tuple<uint32_t, std::vector<std::u16string>>> decodeStopTransient(Buffer& buff);
+    Buffer makeStopOnDemand(const std::vector<std::tuple<uint32_t, std::vector<std::u16string>>>& aliases);
+    std::vector<std::tuple<uint32_t, std::vector<std::u16string>>> decodeStopOnDemand(Buffer& buff);
 
     /**
      * Data sent from the solver to modify an attribute in the world model.

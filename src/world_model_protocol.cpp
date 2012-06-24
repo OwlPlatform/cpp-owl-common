@@ -551,7 +551,7 @@ pair<std::vector<solver::AliasType>, u16string> solver::decodeTypeAnnounceMsg(Bu
   return std::make_pair(aliases, origin);
 }
 
-Buffer solver::makeStartTransient(const std::vector<std::tuple<uint32_t, std::vector<std::u16string>>>& aliases) {
+Buffer solver::makeStartOnDemand(const std::vector<std::tuple<uint32_t, std::vector<std::u16string>>>& aliases) {
   Buffer buff;
 
   //Keep track of the total length of the message (in bytes)
@@ -577,7 +577,7 @@ Buffer solver::makeStartTransient(const std::vector<std::tuple<uint32_t, std::ve
   return buff;
 }
 
-std::vector<std::tuple<uint32_t, std::vector<std::u16string>>> solver::decodeStartTransient(Buffer& buff) {
+std::vector<std::tuple<uint32_t, std::vector<std::u16string>>> solver::decodeStartOnDemand(Buffer& buff) {
   BuffReader reader(buff);
   std::vector<std::tuple<uint32_t, std::vector<std::u16string>>> aliases;
 
@@ -607,13 +607,13 @@ std::vector<std::tuple<uint32_t, std::vector<std::u16string>>> solver::decodeSta
   return aliases;
 }
 
-Buffer solver::makeStopTransient(const std::vector<std::tuple<uint32_t, std::vector<std::u16string>>>& aliases) {
-  Buffer buff = makeStartTransient(aliases);
+Buffer solver::makeStopOnDemand(const std::vector<std::tuple<uint32_t, std::vector<std::u16string>>>& aliases) {
+  Buffer buff = makeStartOnDemand(aliases);
   buff[4] = (uint8_t)MessageID::stop_transient;
   return buff;
 }
 
-std::vector<std::tuple<uint32_t, std::vector<std::u16string>>> solver::decodeStopTransient(Buffer& buff) {
+std::vector<std::tuple<uint32_t, std::vector<std::u16string>>> solver::decodeStopOnDemand(Buffer& buff) {
   //Check to make sure this is a valid message.
   BuffReader reader(buff);
   uint32_t total_length = reader.readPrimitive<uint32_t>();
@@ -622,7 +622,7 @@ std::vector<std::tuple<uint32_t, std::vector<std::u16string>>> solver::decodeSto
        msg_type == MessageID::stop_transient) {
 
     buff[4] = (uint8_t)MessageID::start_on_demand;
-    return decodeStartTransient(buff);
+    return decodeStartOnDemand(buff);
   }
   //Otherwise return an empty vector
   return std::vector<std::tuple<uint32_t, std::vector<std::u16string>>>();
