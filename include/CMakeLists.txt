@@ -6,6 +6,7 @@ SET(IncludeFiles
   simple_sockets.hpp
   world_model_protocol.hpp
   message_receiver.hpp
+  grail_types.hpp
 )
 
 #Need to install all of the include files
