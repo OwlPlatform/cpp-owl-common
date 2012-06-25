@@ -7,8 +7,8 @@
 #ifndef __GRAIL_TYPES_HPP__
 #define __GRAIL_TYPES_HPP__
 
-#include <sample_data.hpp>
-#include <netbuffer.hpp>
+#include "sample_data.hpp"
+#include "netbuffer.hpp"
 #include <functional>
 #include <iostream>
 #include <vector>
