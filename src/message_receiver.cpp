@@ -33,6 +33,8 @@
 #include <cstring>
 #include <unistd.h>
 #include "simple_sockets.hpp"
+#include <poll.h>
+#include <sys/poll.h>
 
 #include "netbuffer.hpp"
 
@@ -55,6 +57,10 @@ bool MessageReceiver::messageAvailable(bool& interrupted) {
   if (not interrupted and 
          (previous_unfinished.size() < 4 or
           previous_unfinished.size() < piece_length)) {
+    //Wait 10ms for data on the socket.
+    if (not sock.inputReady(10)) {
+      return false;
+    }
 
     //Receive a message from the network to get more data.
     ssize_t length = sock.receive(raw_messages);
