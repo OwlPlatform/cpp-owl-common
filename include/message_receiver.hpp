@@ -46,6 +46,12 @@ class MessageReceiver {
     ClientSocket& sock;
 
     /**
+     * Create a buffer for receiving messages so that this is not constantly
+     * allocating and deallocating memory.
+     */
+    std::vector<unsigned char> raw_messages;
+
+    /**
      * Constructor that takes in reference to a socket for packet reception.
      * This class does not own the memory for this socket.
      */

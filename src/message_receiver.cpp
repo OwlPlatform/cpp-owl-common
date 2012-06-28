@@ -36,7 +36,7 @@
 
 #include "netbuffer.hpp"
 
-MessageReceiver::MessageReceiver(ClientSocket& s) : sock(s) {
+MessageReceiver::MessageReceiver(ClientSocket& s) : sock(s), raw_messages(10000) {
   previous_unfinished = std::vector<unsigned char>(0);
 }
 
@@ -57,7 +57,6 @@ bool MessageReceiver::messageAvailable(bool& interrupted) {
           previous_unfinished.size() < piece_length)) {
 
     //Receive a message from the network to get more data.
-    std::vector<unsigned char> raw_messages(10000);
     ssize_t length = sock.receive(raw_messages);
     if ( -1 == length ) {
       //Check for a nonblocking socket
@@ -103,7 +102,6 @@ std::vector<unsigned char> MessageReceiver::getNextMessage(bool& interrupted) {
           previous_unfinished.size() < piece_length)) {
 
     //Receive a message from the network to get more data.
-    std::vector<unsigned char> raw_messages(10000);
     ssize_t length = sock.receive(raw_messages);
     if ( -1 == length ) {
       //Check for a nonblocking socket
