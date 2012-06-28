@@ -79,6 +79,12 @@ class ClientSocket {
     ClientSocket(ClientSocket&& other);
 
     /**
+     * Block for up to @timeout milliseconds while waiting for incoming data.
+     * Returns true when data is available for reading, false otherwise.
+     */
+    bool inputReady(int msec_timeout);
+
+    /**
      * Receive data into the provided buffer.
      */
     ssize_t receive(std::vector<unsigned char>& buff);

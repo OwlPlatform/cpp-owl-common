@@ -106,6 +106,32 @@ ClientSocket::ClientSocket(int domain, int type, int protocol, uint32_t port, co
 ClientSocket::ClientSocket(uint32_t port, const std::string& ip_address, int sock) :
   _port(port), _ip_address(ip_address), sock_fd(sock) {;}
 
+bool ClientSocket::inputReady(int msec_timeout) {
+  //Wait until data is ready
+  pollfd ufd;
+  ufd.fd = sock_fd;
+  ufd.events = POLLIN;
+  //Wait up to timeout millseconds for the poll to finish
+  int result = poll(&ufd, 1, msec_timeout);
+  if (result == 1 and (ufd.revents & (POLLERR | POLLHUP | POLLNVAL)) == 0) {
+    return true;
+  }
+  else {
+    //See if the socket has an error.
+    if ((ufd.revents & (POLLERR | POLLHUP | POLLNVAL)) != 0) {
+      std::string err_str = "";
+      if (ufd.revents & POLLERR) err_str = "socket error";
+      else if (ufd.revents & POLLHUP) err_str = "remote side disconnected";
+      else if (ufd.revents & POLLNVAL) err_str = "bad file descriptor";
+      throw std::runtime_error("Error connecting: "+err_str);
+    }
+    else {
+      return false;
+    }
+  }
+  return false;
+}
+
 ssize_t ClientSocket::receive(std::vector<unsigned char>& buff) {
   //std::array or std::val_array might be more efficient here
   ssize_t bytes_read = read(sock_fd, buff.data(), buff.size());
