@@ -78,10 +78,20 @@ class ClientSocket {
      */
     ClientSocket(ClientSocket&& other);
 
+    /**
+     * Receive data into the provided buffer.
+     */
     ssize_t receive(std::vector<unsigned char>& buff);
+
+    /**
+     * Sends data in the provided buffer.
+     */
     void send(const std::vector<unsigned char>& buff);
 
+    ///Return the port number for this socket
     uint32_t port();
+
+    ///Return the ip address endpoint of the socket
     std::string ip_address();
 };
 
