@@ -51,6 +51,7 @@ bool MessageReceiver::messageAvailable(bool& interrupted) {
   if (previous_unfinished.size() >= 4) {
     piece_length = readPrimitive<uint32_t>(previous_unfinished, 0) + 4;
   }
+  std::unique_lock<std::mutex> lck(sock_mutex);
   //See if we need more data to complete the current packet
   //True if we do not have enough data to determine a packet size
   //or we do not have enough data for a complete packet.
@@ -101,6 +102,7 @@ std::vector<unsigned char> MessageReceiver::getNextMessage(bool& interrupted) {
     piece_length = readPrimitive<uint32_t>(previous_unfinished, 0) + 4;
     //std::cerr<<"Getting piece with length "<<piece_length<<'\n';
   }
+  std::unique_lock<std::mutex> lck(sock_mutex);
   //Get the next packet - keep going while the size can't be read or the
   //size was read but the buffer does not have the whole packet
   while (not interrupted and 

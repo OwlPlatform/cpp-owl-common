@@ -31,8 +31,12 @@
 
 #include <vector>
 #include "simple_sockets.hpp"
+#include <mutex>
 
 class MessageReceiver {
+  private:
+    std::mutex sock_mutex;
+
   public:
     /**
      * Hold a buffer for a unfinished message sent in the last packet that
