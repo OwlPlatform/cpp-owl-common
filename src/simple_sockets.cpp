@@ -111,7 +111,7 @@ bool ClientSocket::inputReady(int msec_timeout) {
   pollfd ufd;
   ufd.fd = sock_fd;
   ufd.events = POLLIN;
-  //Wait up to timeout millseconds for the poll to finish
+  //Wait up to timeout milliseconds for the poll to finish
   int result = poll(&ufd, 1, msec_timeout);
   if (result == 1 and (ufd.revents & (POLLERR | POLLHUP | POLLNVAL)) == 0) {
     return true;
@@ -300,29 +300,45 @@ ClientSocket ServerSocket::next(int flags) {
   struct sockaddr_storage peer_addr;
   socklen_t peer_addr_size = sizeof(sockaddr_storage);
   memset(&peer_addr, 0, sizeof(peer_addr));
-  int in_sock = accept4(sock_fd, (struct sockaddr*)&peer_addr, &peer_addr_size, flags);
 
-  std::string ip = "";
+  //Poll the socket to see if a new connection has arrived
+  //Wait until data is ready
+  pollfd ufd;
+  ufd.fd = sock_fd;
+  ufd.events = POLLIN;
+  //Wait up to 10 milliseconds for the poll to finish
+  int result = poll(&ufd, 1, 10);
+  //Accept a new socket is an input event is polled
+  if (result == 1 and (ufd.revents & (POLLERR | POLLHUP | POLLNVAL)) == 0) {
+    int in_sock = accept4(sock_fd, (struct sockaddr*)&peer_addr, &peer_addr_size, flags);
 
-  if (0 <= in_sock) {
-    //Get the ip address of this new connection
-    char addr_buf[1000] = {0};
-    int err = getnameinfo((struct sockaddr*)&peer_addr, peer_addr_size,
-        addr_buf, sizeof(addr_buf) - 1, NULL, 0, NI_NUMERICHOST);
-    if (err != 0) {
-      std::cerr<<"Error getting client address: "<<gai_strerror(errno)<<'\n';
+    std::string ip = "";
+
+    if (0 <= in_sock) {
+      //Get the ip address of this new connection
+      char addr_buf[1000] = {0};
+      int err = getnameinfo((struct sockaddr*)&peer_addr, peer_addr_size,
+          addr_buf, sizeof(addr_buf) - 1, NULL, 0, NI_NUMERICHOST);
+      if (err != 0) {
+        std::cerr<<"Error getting client address: "<<gai_strerror(errno)<<'\n';
+      }
+
+      ip = std::string(addr_buf);
+      std::cerr<<"Found ip address "<<addr_buf<<'\n';
+    }
+    //Don't print an error if the socket is simply non-blocking
+    else if (errno != EAGAIN and errno != EWOULDBLOCK) {
+      std::cerr<<"Socket failure: "<<strerror(errno)<<"\n";
     }
 
-    ip = std::string(addr_buf);
-    std::cerr<<"Found ip address "<<addr_buf<<'\n';
+    //Control of the socket is handed over to the ClientSocket class.
+    //The socket may be invalid if no new connection was available
+    return ClientSocket(_port, ip, in_sock);
   }
-  //Don't print an error if the socket is simply non-blocking
-  else if (errno != EAGAIN and errno != EWOULDBLOCK) {
-    std::cerr<<"Socket failure: "<<strerror(errno)<<"\n";
+  else {
+    //Return an invalid socket
+    return ClientSocket(_port, "", -1);
   }
-
-  //Control of the socket is handed over to the ClientSocket class.
-  return ClientSocket(_port, ip, in_sock);
 }
 
 ServerSocket::operator bool() const {
