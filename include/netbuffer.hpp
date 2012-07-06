@@ -53,7 +53,7 @@ uint64_t htonll(uint64_t val);
  * Pulls a value out by reassembling the bytes - only works for primitive types.
  */
 template<typename T>
-T readPrimitive(std::vector<unsigned char>& buff, size_t index = 0);
+T readPrimitive(const std::vector<unsigned char>& buff, size_t index = 0);
 
 /*
  * Pulls value out of a buffer and into a container.
@@ -207,7 +207,7 @@ uint32_t pushBackVal(T val, std::vector<unsigned char>& buff);
  ******************************************************************************/
 
 template<typename T>
-T readPrimitive(std::vector<unsigned char>& buff, size_t index) {
+T readPrimitive(const std::vector<unsigned char>& buff, size_t index) {
   T value = 0;
   //Treat the given type as an array of bytes and push the bytes
   //into it one byte at a time

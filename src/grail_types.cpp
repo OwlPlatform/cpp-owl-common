@@ -21,7 +21,7 @@ grail_types::transmitter grail_types::readTransmitterFromBuffer(BuffReader& read
   return t;
 }
 
-grail_types::transmitter grail_types::readTransmitter(std::vector<unsigned char>& buff) {
+grail_types::transmitter grail_types::readTransmitter(const std::vector<unsigned char>& buff) {
   transmitter t;
   t.phy = readPrimitive<unsigned char>(buff, 0);
   t.id.upper = readPrimitive<uint64_t>(buff, 1);

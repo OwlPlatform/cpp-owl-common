@@ -27,7 +27,7 @@ namespace grail_types {
   std::ostream& operator<<(std::ostream& out, const transmitter& t);
 
   transmitter readTransmitterFromBuffer(BuffReader& reader);
-  transmitter readTransmitter(std::vector<unsigned char>& buff);
+  transmitter readTransmitter(const std::vector<unsigned char>& buff);
   //Write the transmitter to a buffer and return the bytes written
   uint32_t writeTransmitter(transmitter t, std::vector<unsigned char>& buff);
 
