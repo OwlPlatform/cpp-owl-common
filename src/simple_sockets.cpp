@@ -16,6 +16,7 @@
 #include <sys/poll.h>
 
 #include "simple_sockets.hpp"
+#include "temporarily_unavailable.hpp"
 
 //Ignore broken pipe errors so that we can just check the return code of write
 //commands to see if they succeed or fail.
@@ -148,7 +149,7 @@ void ClientSocket::send(const std::vector<unsigned char>& buff) {
     fds.events = POLLOUT;
     poll(&fds, 1, 1000);
     if ( (fds.revents & POLLOUT) != POLLOUT) {
-      throw std::runtime_error("Error sending data over socket: Resource temporarily unavailable");
+      throw temporarily_unavailable();
     }
 
     //Send the previously unsent portions of the message.

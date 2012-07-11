@@ -7,6 +7,7 @@ SET(IncludeFiles
   world_model_protocol.hpp
   message_receiver.hpp
   grail_types.hpp
+  temporarily_unavailable.hpp
 )
 
 #Need to install all of the include files
