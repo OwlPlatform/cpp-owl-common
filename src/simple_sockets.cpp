@@ -6,13 +6,13 @@
 
 #include <unistd.h>
 #include <errno.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <poll.h>
 #include <string.h>
 #include <sys/types.h>
+#include <sys/socket.h>
 #include <sys/poll.h>
 
 #include "simple_sockets.hpp"
@@ -21,6 +21,21 @@
 //Ignore broken pipe errors so that we can just check the return code of write
 //commands to see if they succeed or fail.
 #include <signal.h>
+
+void socketCleanup(int& sock_fd) {
+  if (sock_fd >= 0) {
+    //Shut down sending and receiving on this socket
+    shutdown(sock_fd, SHUT_RDWR);
+    //Block until read returns 0 or the socket locks up
+    char buff[100];
+    //TODO FIXME Not actually blocking here
+    while (0 != read(sock_fd, buff, sizeof(buff)) and
+           EWOULDBLOCK != errno);
+    //TODO FIXME Should check error codes here
+    close(sock_fd);
+    sock_fd = -1;
+  }
+}
 
 ClientSocket::ClientSocket(int domain, int type, int protocol, uint32_t port, const std::string& ip_address, int sock_flags) :
   _port(port), _ip_address(ip_address) {
@@ -105,7 +120,10 @@ ClientSocket::ClientSocket(int domain, int type, int protocol, uint32_t port, co
 }
 
 ClientSocket::ClientSocket(uint32_t port, const std::string& ip_address, int sock) :
-  _port(port), _ip_address(ip_address), sock_fd(sock) {;}
+  _port(port), _ip_address(ip_address), sock_fd(sock) {
+  //Set up an interrupt handler to ignore broken pipes.
+  signal(SIGPIPE, SIG_IGN);
+}
 
 bool ClientSocket::inputReady(int msec_timeout) {
   //Wait until data is ready
@@ -124,6 +142,8 @@ bool ClientSocket::inputReady(int msec_timeout) {
       if (ufd.revents & POLLERR) err_str = "socket error";
       else if (ufd.revents & POLLHUP) err_str = "remote side disconnected";
       else if (ufd.revents & POLLNVAL) err_str = "bad file descriptor";
+      //Clean up the socket (close connection and file descriptor)
+      socketCleanup(sock_fd);
       throw std::runtime_error("Error connecting: "+err_str);
     }
     else {
@@ -153,14 +173,15 @@ void ClientSocket::send(const std::vector<unsigned char>& buff) {
     }
 
     //Send the previously unsent portions of the message.
-    int result = write(sock_fd, arr.c_str()+written, arr.length() - written);
+    int result = ::send(sock_fd, arr.c_str()+written, arr.length() - written, MSG_NOSIGNAL);
     if (-1 == result) {
       std::string err_str(strerror(errno));
       if (err_str == "Broken pipe") {
         err_str = "Connection closed by receiver (broken pipe)";
       }
       err_str = "Error sending data over socket: " + err_str;
-      std::cerr<<err_str<<'\n';
+      //Clean up the socket (close connection and file descriptor)
+      socketCleanup(sock_fd);
       throw std::runtime_error(err_str);
     }
     else {
@@ -177,18 +198,7 @@ ClientSocket::operator bool() const {
 
 //Close the connection in the destructor
 ClientSocket::~ClientSocket() {
-  if (sock_fd >= 0) {
-    //Shut down sending and receiving on this socket
-    shutdown(sock_fd, SHUT_RDWR);
-    //Block until read returns 0 or the socket locks up
-    char buff[100];
-    //TODO FIXME Not actually blocking here
-    while (0 != read(sock_fd, buff, sizeof(buff)) and
-           EWOULDBLOCK != errno);
-    //TODO FIXME Should check error codes here
-    close(sock_fd);
-    sock_fd = -1;
-  }
+  socketCleanup(sock_fd);
 }
 
 ClientSocket& ClientSocket::operator=(ClientSocket&& other) {
