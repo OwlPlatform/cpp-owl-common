@@ -202,6 +202,17 @@ ClientSocket::~ClientSocket() {
 }
 
 ClientSocket& ClientSocket::operator=(ClientSocket&& other) {
+  //Close the existing socket if we are assigning over it
+  if (sock_fd >= 0) {
+    //Shut down sending and receiving on this socket
+    shutdown(sock_fd, SHUT_RDWR);
+    //Block until read returns 0 or the socket locks up
+    char buff[100];
+    while (0 != read(sock_fd, buff, sizeof(buff)) and
+           EWOULDBLOCK != errno);
+    close(sock_fd);
+    sock_fd = -1;
+  }
   _port = other._port;
   _ip_address = other._ip_address;
   sock_fd = other.sock_fd;
