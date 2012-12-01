@@ -24,9 +24,13 @@ std::ostream& operator<<(std::ostream& os, const uint128_t& val) {
   //applying the << operator.
   uint64_t upper = val.upper;
   uint64_t lower = val.lower;
-  //return os<<"0x"<<std::hex<<upper<<lower<<std::dec;
+  //Save current format flags
+  std::ios_base::fmtflags flags = os.flags();
+  return os<<std::hex<<std::showbase<<upper<<lower<<std::dec;
+  //Reset format flags
+  os.flags(flags);
   //TODO FIXME This assumes that the number is actually only 64 bits long.
-  return os<<lower<<std::dec;
+  //return os<<lower<<std::dec;
 }
 
 //TODO FIXME This assumes that the input number is actually only 64 bits long.
