@@ -26,7 +26,7 @@ std::ostream& operator<<(std::ostream& os, const uint128_t& val) {
   uint64_t lower = val.lower;
   //Save current format flags
   std::ios_base::fmtflags flags = os.flags();
-  return os<<std::hex<<std::showbase<<upper<<lower<<std::dec;
+  return os<<"0x"<<std::hex<<upper<<lower<<std::dec;
   //Reset format flags
   os.flags(flags);
   //TODO FIXME This assumes that the number is actually only 64 bits long.
