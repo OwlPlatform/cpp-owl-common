@@ -1,5 +1,5 @@
-libcplusplus
-============
+libowl-common
+=============
                           Owl Platform C++ Libraries
 
 Version 1.0.0
