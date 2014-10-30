@@ -91,6 +91,7 @@ class ClientSocket {
 
     /**
      * Sends data in the provided buffer.
+     * Throws a std::runtime_error upon failure.
      */
     void send(const std::vector<unsigned char>& buff);
 
