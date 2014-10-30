@@ -70,14 +70,6 @@ typedef uint128_t TransmitterID;
 typedef uint128_t ReceiverID;
 typedef int64_t Timestamp;
 
-//Define a type for the FSM_TR byte and its masks.
-typedef unsigned char FSM_TR;
-enum FSM_MASK {fixed       = 0x00,
-               semi_fixed  = 0x01,
-               mobile      = 0x02};
-enum TR_MASK { transmitter = 0x00,
-               receiver    = 0x10};
-
 //Sample data with details about a packet from a transmitter to a receiver.
 struct SampleData {
   unsigned char physical_layer;
@@ -85,15 +77,12 @@ struct SampleData {
   ReceiverID rx_id;
   Timestamp rx_timestamp;
   float rss;
-  //TODO The FSM_TR field will be removed in the future.
-  FSM_TR type;
   std::vector<unsigned char> sense_data;
   bool valid;
 };
 
 //Device position
 struct DevicePosition {
-  FSM_TR type;
   unsigned char physical_layer;
   TransmitterID device_id;
   float x;
