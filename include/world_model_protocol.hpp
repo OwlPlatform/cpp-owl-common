@@ -28,7 +28,9 @@
 #ifndef __WORLD_MODEL_PROTOCOL_HPP__
 #define __WORLD_MODEL_PROTOCOL_HPP__
 
+#include <cstdint>
 #include <climits>
+
 #include <map>
 #include <string>
 #include <tuple>
